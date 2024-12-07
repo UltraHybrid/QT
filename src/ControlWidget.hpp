@@ -10,21 +10,6 @@ class RelationWidget;
 class ShapeWidget;
 
 
-struct ShapeInfo
-{
-	qint32 type{};
-	QPoint pos;
-	QPoint size;
-	QVector<qint32> relationIds{};
-};
-
-QDataStream& operator<<(QDataStream& out, const ShapeInfo& st);
-
-QDataStream& operator>>(QDataStream& in, const ShapeInfo& st);
-
-
-
-
 class ControlWidget : public QWidget {
 public:
 	enum class Regime
@@ -57,7 +42,6 @@ private:
 	ShapeType createShapeType;
 
 
-private:
 	QPoint oldPos;
 	QPoint shapePosBeforeMoving;
 

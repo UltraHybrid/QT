@@ -33,6 +33,8 @@ add_executable(untitled3
         src/ShapeType.hpp
         src/ShapeFactory.cpp
         src/ShapeFactory.hpp
+        src/ShapeInfo.cpp
+        src/ShapeInfo.hpp
 )
 target_link_libraries(untitled3
   Qt::Core

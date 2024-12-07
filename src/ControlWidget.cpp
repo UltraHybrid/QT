@@ -3,28 +3,11 @@
 #include <iostream>
 #include <qevent.h>
 
+#include "ShapeInfo.hpp"
 #include "ShapeFactory.hpp"
 #include "ShapeWidget.hpp"
 #include "RelationWidget.hpp"
 
-
-QDataStream& operator<<(QDataStream& out, const ShapeInfo& st)
-{
-	out << st.type;
-	out << st.pos;
-	out << st.size;
-	out << st.relationIds;
-	return out;
-}
-
-QDataStream& operator>>(QDataStream& in, ShapeInfo& st)
-{
-	in >> st.type;
-	in >> st.pos;
-	in >> st.size;
-	in >> st.relationIds;
-	return in;
-}
 
 ControlWidget::ControlWidget(QWidget* parent) : QWidget(parent)
 {
@@ -32,7 +15,7 @@ ControlWidget::ControlWidget(QWidget* parent) : QWidget(parent)
 
 void ControlWidget::mouseMoveEvent(QMouseEvent* event)
 {
-	// QWidget::mouseMoveEvent(event);
+	QWidget::mouseMoveEvent(event);
 	if (regime == Regime::CREATE)
 	{
 		const auto pos = event->pos();
@@ -78,7 +61,6 @@ void ControlWidget::mousePressEvent(QMouseEvent* event)
 			}
 			break;
 		case Regime::DELETE:
-			//TODO relations
 			if (focusShape && event->button() == Qt::LeftButton)
 			{
 				clearShape(focusShape);
@@ -196,12 +178,12 @@ void ControlWidget::resizeEvent(QResizeEvent* event)
 	QWidget::resizeEvent(event);
 }
 
-void ControlWidget::setRegime(Regime regime)
+void ControlWidget::setRegime(const Regime regime)
 {
 	this->regime = regime;
 }
 
-void ControlWidget::setShapeType(ShapeType type)
+void ControlWidget::setShapeType(const ShapeType type)
 {
 	createShapeType = type;
 }
