@@ -3,9 +3,28 @@
 #include <iostream>
 #include <qevent.h>
 
-#include "RelationWidget.hpp"
+#include "ShapeFactory.hpp"
 #include "ShapeWidget.hpp"
+#include "RelationWidget.hpp"
 
+
+QDataStream& operator<<(QDataStream& out, const ShapeInfo& st)
+{
+	out << st.type;
+	out << st.pos;
+	out << st.size;
+	out << st.relationIds;
+	return out;
+}
+
+QDataStream& operator>>(QDataStream& in, ShapeInfo& st)
+{
+	in >> st.type;
+	in >> st.pos;
+	in >> st.size;
+	in >> st.relationIds;
+	return in;
+}
 
 ControlWidget::ControlWidget(QWidget* parent) : QWidget(parent)
 {
@@ -228,4 +247,86 @@ ShapeWidget* ControlWidget::getFocusShape()
 		return *shape;
 	}
 	return nullptr;
+}
+
+bool ControlWidget::isShapesConnect(ShapeWidget* sw1, ShapeWidget* sw2)
+{
+	return std::ranges::any_of(sw1->getRelations(), [sw2](const RelationWidget* rw)
+	{
+		return rw->getFirst() == sw2 || rw->getSecond() == sw2;
+	});
+// 	for (auto a : sw1->getRelations())
+// 	{
+// 		if (a->getFirst() == sw2 || a->getSecond() == sw2) return true;
+// 	}
+// 	return false;
+}
+
+void ControlWidget::saveTo(QDataStream& stream)
+{
+	auto v = std::vector<ShapeWidget*>{shapes.begin(), shapes.end()};
+	auto res = QVector<ShapeInfo>{};
+	for (const auto sw : v)
+	{
+		ShapeInfo info;
+		info.type = static_cast<int>(sw->getType());
+		info.pos = sw->pos();
+		info.size = {sw->width(), sw->height()};
+		info.relationIds.reserve(sw->getRelations().size());
+
+		std::ranges::transform(sw->getRelations(), std::back_inserter(info.relationIds), [v, sw](RelationWidget* rw)
+		{
+			const auto relateShape = rw->getFirst() == sw ? rw->getSecond() : rw->getFirst();
+			return std::ranges::find(v, relateShape) - v.begin();
+		});
+
+		res.emplace_back(info);
+	}
+
+	stream << res;
+}
+
+void ControlWidget::loadFrom(QDataStream& stream)
+{
+	activeShape = nullptr;
+	activeRelation = nullptr;
+	std::ranges::for_each(shapes, [](ShapeWidget* s){ s->close();});
+	shapes.clear();
+
+	auto in = QVector<ShapeInfo>{};
+
+	stream >> in;
+
+	auto inShapes = QVector<ShapeWidget*>{};
+
+	for (const auto& e: in)
+	{
+		auto shape = ShapeFactory::createShape(static_cast<ShapeType>(e.type));
+		shape->setParent(this);
+		shape->resize(e.size.x(), e.size.y());
+		shape->move(e.pos);
+		shape->show();
+		inShapes.push_back(shape);
+	}
+
+	for (auto i = 0; i < in.size(); ++i)
+	{
+		auto& shapeInfo = in.at(i);
+		for (auto j : shapeInfo.relationIds)
+		{
+			if (isShapesConnect(inShapes.at(i), inShapes.at(j))) continue;
+
+			auto relation = new RelationWidget;
+			relation->setParent(this);
+			relation->setFirst(inShapes.at(i));
+			relation->setSecond(inShapes.at(j));
+
+			relation->getFirst()->addRelation(relation);
+			relation->getSecond()->addRelation(relation);
+
+			relation->show();
+		}
+	}
+
+	shapes = std::unordered_set<ShapeWidget*>{inShapes.begin(), inShapes.end()};
 }

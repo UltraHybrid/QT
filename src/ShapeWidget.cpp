@@ -1,6 +1,7 @@
 #include "ShapeWidget.hpp"
 
-ShapeWidget::ShapeWidget(QWidget* parent = nullptr) : QWidget(parent)
+
+ShapeWidget::ShapeWidget(QWidget* parent, const ShapeType type) : QWidget(parent), type(type)
 {
 	setAttribute(Qt::WA_NoSystemBackground);
 	setFocusPolicy(Qt::NoFocus);

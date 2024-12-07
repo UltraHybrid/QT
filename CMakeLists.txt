@@ -30,6 +30,9 @@ add_executable(untitled3
         src/EllipseWidget.hpp
         src/RectangleWidget.cpp
         src/RectangleWidget.hpp
+        src/ShapeType.hpp
+        src/ShapeFactory.cpp
+        src/ShapeFactory.hpp
 )
 target_link_libraries(untitled3
   Qt::Core

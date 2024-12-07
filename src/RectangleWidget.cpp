@@ -2,7 +2,7 @@
 
 #include <qpainter.h>
 
-RectangleWidget::RectangleWidget(QWidget* parent) : ShapeWidget(parent)
+RectangleWidget::RectangleWidget(QWidget* parent) : ShapeWidget(parent, ShapeType::RECTANGLE)
 {
 }
 

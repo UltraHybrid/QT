@@ -3,7 +3,7 @@
 #include <qpainter.h>
 
 
-EllipseWidget::EllipseWidget(QWidget* parent): ShapeWidget(parent)
+EllipseWidget::EllipseWidget(QWidget* parent): ShapeWidget(parent, ShapeType::ELLIPSE)
 {
 }
 

@@ -3,7 +3,7 @@
 #include <qpainter.h>
 
 
-TriangleWidget::TriangleWidget(QWidget* parent) : ShapeWidget(parent)
+TriangleWidget::TriangleWidget(QWidget* parent) : ShapeWidget(parent, ShapeType::TRIANGLE)
 {
 
 }
