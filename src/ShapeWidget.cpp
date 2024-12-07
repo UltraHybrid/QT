@@ -3,6 +3,9 @@
 ShapeWidget::ShapeWidget(QWidget* parent = nullptr) : QWidget(parent)
 {
 	setAttribute(Qt::WA_NoSystemBackground);
+	setFocusPolicy(Qt::NoFocus);
+	setAttribute( Qt::WA_TransparentForMouseEvents );
+	setMouseTracking(false);
 }
 
 void ShapeWidget::addRelation(RelationWidget* relation)

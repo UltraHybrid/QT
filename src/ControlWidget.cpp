@@ -13,7 +13,7 @@ ControlWidget::ControlWidget(QWidget* parent) : QWidget(parent)
 
 void ControlWidget::mouseMoveEvent(QMouseEvent* event)
 {
-	QWidget::mouseMoveEvent(event);
+	// QWidget::mouseMoveEvent(event);
 	if (regime == Regime::CREATE)
 	{
 		const auto pos = event->pos();
@@ -29,6 +29,7 @@ void ControlWidget::mouseMoveEvent(QMouseEvent* event)
 		if (activeRelation)
 		{
 			activeRelation->setDstPoint(mapFromGlobal(QCursor::pos()));
+			repaint();
 		}
 	}
 	else if (regime == Regime::MOVE && event->buttons().testFlag(Qt::LeftButton) && activeShape)
@@ -53,7 +54,6 @@ void ControlWidget::mousePressEvent(QMouseEvent* event)
 				activeShape = creator();
 				activeShape->setParent(this);
 				activeShape->move(pos.x(), pos.y());
-				activeShape->setFocusPolicy(Qt::FocusPolicy::ClickFocus);
 				activeShape->resize(1, 1);
 				activeShape->show();
 			}
@@ -80,12 +80,7 @@ void ControlWidget::mousePressEvent(QMouseEvent* event)
 		case Regime::RELATION:
 			if (!activeRelation && focusShape && event->button() == Qt::LeftButton)
 			{
-				activeRelation = new RelationWidget{};
-				activeRelation->setParent(this);
-				activeRelation->setFocusPolicy(Qt::NoFocus);
-				activeRelation->setFirst(focusShape);
-				activeRelation->setDstPoint(mapFromGlobal(QCursor::pos()));
-				activeRelation->show();
+				activeShape = focusShape;
 			}
 			break;
 		case Regime::MOVE:
@@ -123,31 +118,36 @@ void ControlWidget::mouseReleaseEvent(QMouseEvent* event)
 			}
 		case Regime::MOVE:
 			setCursor(QCursor(Qt::ArrowCursor));
-			activeShape = nullptr;
-			break;
+		activeShape = nullptr;
+		break;
 		case Regime::RELATION:
-			if (event->button() == Qt::RightButton)
+			if (const auto shape = getFocusShape(); shape && event->button() == Qt::LeftButton)
 			{
-				resetCreatedRelation();
-			}
-
-			if (const auto shape = getFocusShape())
-			{
-				if (activeRelation)
+				// first
+				if (!activeRelation && activeShape == shape)
+				{
+					activeRelation = new RelationWidget{};
+					activeRelation->setParent(this);
+					activeRelation->setFirst(shape);
+					activeRelation->setDstPoint(mapFromGlobal(QCursor::pos()));
+					activeRelation->show();
+				}
+				// second
+				else if (activeRelation && activeShape != shape)
 				{
 					activeRelation->setSecond(shape);
 					activeRelation->getFirst()->addRelation(activeRelation);
 					activeRelation->getSecond()->addRelation(activeRelation);
 					activeRelation = nullptr;
+					activeShape = nullptr;
 				}
 			}
 			else
 			{
 				resetCreatedRelation();
 			}
-			break;
+		break;
 	}
-
 }
 
 void ControlWidget::keyPressEvent(QKeyEvent* event)
@@ -155,8 +155,15 @@ void ControlWidget::keyPressEvent(QKeyEvent* event)
 	QWidget::keyPressEvent(event);
 	if (event->key() == Qt::Key_Escape)
 	{
-		resetCreatedShape();
-		resetCreatedRelation();
+		if (regime == Regime::CREATE)
+		{
+			resetCreatedShape();
+		}
+		if (regime == Regime::RELATION)
+		{
+			resetCreatedRelation();
+			activeShape = nullptr;
+		}
 	}
 }
 

@@ -12,7 +12,6 @@ MainWnd::MainWnd(QWidget *parent) :
     ui->setupUi(this);
 
     cw = new ControlWidget{ui->frame};
-
     auto horizontalLayout = new QHBoxLayout(ui->frame);
     QSizePolicy sizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
     sizePolicy.setHorizontalStretch(0);
@@ -20,8 +19,13 @@ MainWnd::MainWnd(QWidget *parent) :
     sizePolicy.setHeightForWidth(cw->sizePolicy().hasHeightForWidth());
     cw->setSizePolicy(sizePolicy);
     horizontalLayout->addWidget(cw);
-    cw->show();
+
+    cw->setMouseTracking(true);
+    ui->frame->setMouseTracking(true);
+    ui->frame->setFocusPolicy(Qt::ClickFocus);
     cw->setFocusPolicy(Qt::FocusPolicy::ClickFocus);
+
+    cw->show();
 
     connect(ui->delete_action, &QAction::triggered, cw,
         [=] { cw->setRegime(ControlWidget::Regime::DELETE); });

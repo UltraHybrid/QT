@@ -1,12 +1,16 @@
 #include "RelationWidget.hpp"
 
-#include <iostream>
 #include <qpainter.h>
 
 #include "ShapeWidget.hpp"
 
+
 RelationWidget::RelationWidget(QWidget* parent) : QWidget(parent)
 {
+	setAttribute(Qt::WA_NoSystemBackground);
+	setFocusPolicy(Qt::NoFocus);
+	setAttribute( Qt::WA_TransparentForMouseEvents );
+	setMouseTracking(false);
 }
 
 void RelationWidget::paintEvent(QPaintEvent* event)
