@@ -67,13 +67,9 @@ void ControlWidget::mousePressEvent(QMouseEvent* event)
 	switch (regime)
 	{
 		case Regime::CREATE:
-			if (!activeShape && event->button() == Qt::LeftButton && creator)
+			if (!activeShape && event->button() == Qt::LeftButton)
 			{
-				const auto pos = event->pos();
-				activeShape = creator();
-				activeShape->setParent(this);
-				activeShape->move(pos.x(), pos.y());
-				activeShape->resize(1, 1);
+				activeShape = ShapeFactory::createShape(this, createShapeType, event->pos(), {1, 1});
 				activeShape->show();
 			}
 			else if (event->button() == Qt::RightButton)
@@ -85,14 +81,8 @@ void ControlWidget::mousePressEvent(QMouseEvent* event)
 			//TODO relations
 			if (focusShape && event->button() == Qt::LeftButton)
 			{
-				for (const auto r : focusShape->getRelations())
-				{
-					r->getFirst()->removeRelation(r);
-					r->getSecond()->removeRelation(r);
-					r->close();
-				}
+				clearShape(focusShape);
 				shapes.erase(focusShape);
-				focusShape->close();
 			}
 			break;
 
@@ -155,18 +145,16 @@ void ControlWidget::mouseReleaseEvent(QMouseEvent* event)
 				// first
 				if (!activeRelation && activeShape == shape)
 				{
-					activeRelation = new RelationWidget{};
-					activeRelation->setParent(this);
-					activeRelation->setFirst(shape);
+					activeRelation = createRelation(this, shape, nullptr);
 					activeRelation->setDstPoint(mapFromGlobal(QCursor::pos()));
 					activeRelation->show();
 				}
 				// second
 				else if (activeRelation && activeShape != shape)
 				{
-					activeRelation->setSecond(shape);
-					activeRelation->getFirst()->addRelation(activeRelation);
-					activeRelation->getSecond()->addRelation(activeRelation);
+					activeRelation->close();
+					activeRelation = createRelation(this, activeShape, shape);
+					activeRelation->show();
 					activeRelation = nullptr;
 					activeShape = nullptr;
 				}
@@ -213,9 +201,9 @@ void ControlWidget::setRegime(Regime regime)
 	this->regime = regime;
 }
 
-void ControlWidget::setShapeCreator(std::function<ShapeWidget*()>&& cr)
+void ControlWidget::setShapeType(ShapeType type)
 {
-	creator = cr;
+	createShapeType = type;
 }
 
 void ControlWidget::resetCreatedShape()
@@ -238,7 +226,7 @@ void ControlWidget::resetCreatedRelation()
 
 ShapeWidget* ControlWidget::getFocusShape()
 {
-	auto shape = std::ranges::find_if(shapes, [this](const ShapeWidget* sw)
+	const auto shape = std::ranges::find_if(shapes, [this](const ShapeWidget* sw)
 	{
 		return sw->rect().contains(mapFromGlobal(QCursor::pos()) - sw->pos());
 	});
@@ -255,18 +243,46 @@ bool ControlWidget::isShapesConnect(ShapeWidget* sw1, ShapeWidget* sw2)
 	{
 		return rw->getFirst() == sw2 || rw->getSecond() == sw2;
 	});
-// 	for (auto a : sw1->getRelations())
-// 	{
-// 		if (a->getFirst() == sw2 || a->getSecond() == sw2) return true;
-// 	}
-// 	return false;
+}
+
+RelationWidget* ControlWidget::createRelation(QWidget* parent, ShapeWidget* sw1, ShapeWidget* sw2)
+{
+	const auto rel = new RelationWidget;
+	rel->setParent(parent);
+	rel->setFirst(sw1);
+	rel->setSecond(sw2);
+
+	if (sw1 && sw2)
+	{
+		sw1->addRelation(rel);
+		sw2->addRelation(rel);
+	}
+
+	return rel;
+}
+
+void ControlWidget::clearShape(ShapeWidget* sw)
+{
+	for (const auto r : sw->getRelations())
+	{
+		r->getFirst()->removeRelation(r);
+		r->getSecond()->removeRelation(r);
+		r->close();
+	}
+	sw->close();
+}
+
+void ControlWidget::removeAllShapes()
+{
+	std::ranges::for_each(shapes, [](ShapeWidget* s){ clearShape(s);});
+	shapes.clear();
 }
 
 void ControlWidget::saveTo(QDataStream& stream)
 {
-	auto v = std::vector<ShapeWidget*>{shapes.begin(), shapes.end()};
+	const auto shapesV = std::vector<ShapeWidget*>{shapes.begin(), shapes.end()};
 	auto res = QVector<ShapeInfo>{};
-	for (const auto sw : v)
+	for (const auto sw : shapesV)
 	{
 		ShapeInfo info;
 		info.type = static_cast<int>(sw->getType());
@@ -274,10 +290,10 @@ void ControlWidget::saveTo(QDataStream& stream)
 		info.size = {sw->width(), sw->height()};
 		info.relationIds.reserve(sw->getRelations().size());
 
-		std::ranges::transform(sw->getRelations(), std::back_inserter(info.relationIds), [v, sw](RelationWidget* rw)
+		std::ranges::transform(sw->getRelations(), std::back_inserter(info.relationIds), [shapesV, sw](RelationWidget* rw)
 		{
 			const auto relateShape = rw->getFirst() == sw ? rw->getSecond() : rw->getFirst();
-			return std::ranges::find(v, relateShape) - v.begin();
+			return std::ranges::find(shapesV, relateShape) - shapesV.begin();
 		});
 
 		res.emplace_back(info);
@@ -290,8 +306,8 @@ void ControlWidget::loadFrom(QDataStream& stream)
 {
 	activeShape = nullptr;
 	activeRelation = nullptr;
-	std::ranges::for_each(shapes, [](ShapeWidget* s){ s->close();});
-	shapes.clear();
+	removeAllShapes();
+
 
 	auto in = QVector<ShapeInfo>{};
 
@@ -301,10 +317,7 @@ void ControlWidget::loadFrom(QDataStream& stream)
 
 	for (const auto& e: in)
 	{
-		auto shape = ShapeFactory::createShape(static_cast<ShapeType>(e.type));
-		shape->setParent(this);
-		shape->resize(e.size.x(), e.size.y());
-		shape->move(e.pos);
+		const auto shape = ShapeFactory::createShape(this, static_cast<ShapeType>(e.type), e.pos, e.size);
 		shape->show();
 		inShapes.push_back(shape);
 	}
@@ -312,18 +325,10 @@ void ControlWidget::loadFrom(QDataStream& stream)
 	for (auto i = 0; i < in.size(); ++i)
 	{
 		auto& shapeInfo = in.at(i);
-		for (auto j : shapeInfo.relationIds)
+		for (const auto j : shapeInfo.relationIds)
 		{
 			if (isShapesConnect(inShapes.at(i), inShapes.at(j))) continue;
-
-			auto relation = new RelationWidget;
-			relation->setParent(this);
-			relation->setFirst(inShapes.at(i));
-			relation->setSecond(inShapes.at(j));
-
-			relation->getFirst()->addRelation(relation);
-			relation->getSecond()->addRelation(relation);
-
+			const auto relation = createRelation(this, inShapes.at(i), inShapes.at(j));
 			relation->show();
 		}
 	}

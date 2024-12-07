@@ -1,9 +1,4 @@
-//
-// Created by Ultra on 03.12.2024.
-//
-
-#ifndef MAINWND_HPP
-#define MAINWND_HPP
+#pragma once
 
 #include <qgraphicsscene.h>
 #include <QMainWindow>
@@ -24,6 +19,3 @@ private:
     ControlWidget* cw;
     Ui::MainWnd *ui;
 };
-
-
-#endif //MAINWND_HPP

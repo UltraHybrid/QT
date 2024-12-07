@@ -12,12 +12,10 @@ class ShapeWidget;
 
 struct ShapeInfo
 {
-	qint32 type;
+	qint32 type{};
 	QPoint pos;
 	QPoint size;
 	QVector<qint32> relationIds{};
-
-
 };
 
 QDataStream& operator<<(QDataStream& out, const ShapeInfo& st);
@@ -47,17 +45,19 @@ public:
 	void resizeEvent(QResizeEvent* event) override;
 
 	void setRegime(Regime regime);
-	void setShapeCreator(std::function<ShapeWidget*()>&& cr);
 	void saveTo(QDataStream &stream);
 	void loadFrom(QDataStream &stream);
+	void setShapeType(ShapeType type);
 
 private:
 	ShapeWidget* activeShape{nullptr};
 	RelationWidget* activeRelation{nullptr};
 	std::unordered_set<ShapeWidget*> shapes{};
 	Regime regime{Regime::NONE};
+	ShapeType createShapeType;
 
-	std::function<ShapeWidget*()> creator = nullptr;
+
+private:
 	QPoint oldPos;
 	QPoint shapePosBeforeMoving;
 
@@ -66,4 +66,9 @@ private:
 	ShapeWidget* getFocusShape();
 
 	static bool isShapesConnect(ShapeWidget* sw1, ShapeWidget* sw2);
+
+	static RelationWidget* createRelation(QWidget* parent, ShapeWidget* sw1, ShapeWidget* sw2);
+
+	static void clearShape(ShapeWidget* sw);
+	void removeAllShapes();
 };

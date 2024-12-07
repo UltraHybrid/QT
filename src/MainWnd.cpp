@@ -40,19 +40,19 @@ MainWnd::MainWnd(QWidget *parent) :
     [=]
     {
         cw->setRegime(ControlWidget::Regime::CREATE);
-        cw->setShapeCreator([]{ return new EllipseWidget;});
+        cw->setShapeType(ShapeType::ELLIPSE);
     });
     connect(ui->rectangle_create_action, &QAction::triggered, cw,
     [=]
     {
         cw->setRegime(ControlWidget::Regime::CREATE);
-        cw->setShapeCreator([]{ return new RectangleWidget;});
+        cw->setShapeType(ShapeType::RECTANGLE);
     });
     connect(ui->triangle_create_atcion, &QAction::triggered, cw,
     [=]
     {
         cw->setRegime(ControlWidget::Regime::CREATE);
-        cw->setShapeCreator([]{ return new TriangleWidget;});
+        cw->setShapeType(ShapeType::TRIANGLE);
     });
     connect(ui->save_action, &QAction::triggered, cw,
    [=]
@@ -60,6 +60,7 @@ MainWnd::MainWnd(QWidget *parent) :
        QString filters("Custom files (*.cum);;All files (*.*)");
        QString defaultFilter("Custom files (*.cum)");
        auto path = QFileDialog::getSaveFileName(0, "Save file", QDir::currentPath(), filters, &defaultFilter);
+       if (path.isEmpty()) return;
        auto file = QFile{path};
        file.open(QIODeviceBase::WriteOnly);
        QDataStream out(&file);
@@ -72,6 +73,7 @@ MainWnd::MainWnd(QWidget *parent) :
         QString filters("Custom files (*.cum);;All files (*.*)");
         QString defaultFilter("Custom files (*.cum)");
         auto path = QFileDialog::getOpenFileName(0, "Open file", QDir::currentPath(), filters, &defaultFilter);
+        if (path.isEmpty()) return;
         auto file = QFile{path};
         file.open(QIODeviceBase::ReadOnly);
         QDataStream out(&file);
