@@ -89,6 +89,7 @@ void ControlWidget::mousePressEvent(QMouseEvent* event)
 				activeShape = focusShape;
 				setCursor(QCursor(Qt::ClosedHandCursor));
 				oldPos = mapFromGlobal(QCursor::pos());
+				shapePosBeforeMoving = activeShape->pos();
 			}
 			break;
 		default: ;
@@ -117,8 +118,17 @@ void ControlWidget::mouseReleaseEvent(QMouseEvent* event)
 				}
 			}
 		case Regime::MOVE:
-			setCursor(QCursor(Qt::ArrowCursor));
-		activeShape = nullptr;
+			if (event->button() == Qt::LeftButton)
+			{
+				setCursor(QCursor(Qt::ArrowCursor));
+			}
+			if (event->button() == Qt::RightButton)
+			{
+				setCursor(QCursor(Qt::ArrowCursor));
+				activeShape->move(shapePosBeforeMoving);
+				repaint();
+			}
+			activeShape = nullptr;
 		break;
 		case Regime::RELATION:
 			if (const auto shape = getFocusShape(); shape && event->button() == Qt::LeftButton)
@@ -155,13 +165,20 @@ void ControlWidget::keyPressEvent(QKeyEvent* event)
 	QWidget::keyPressEvent(event);
 	if (event->key() == Qt::Key_Escape)
 	{
-		if (regime == Regime::CREATE)
+		if (regime == Regime::CREATE && activeShape)
 		{
 			resetCreatedShape();
 		}
-		if (regime == Regime::RELATION)
+		if (regime == Regime::RELATION && activeRelation)
 		{
 			resetCreatedRelation();
+			activeShape = nullptr;
+		}
+		if (regime == Regime::MOVE && activeShape)
+		{
+			setCursor(QCursor(Qt::ArrowCursor));
+			activeShape->move(shapePosBeforeMoving);
+			repaint();
 			activeShape = nullptr;
 		}
 	}

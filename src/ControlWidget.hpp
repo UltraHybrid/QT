@@ -37,6 +37,7 @@ private:
 
 	std::function<ShapeWidget*()> creator = nullptr;
 	QPoint oldPos;
+	QPoint shapePosBeforeMoving;
 
 	void resetCreatedShape();
 	void resetCreatedRelation();
