@@ -2,7 +2,7 @@
 
 #include "RelationWidget.hpp"
 
-AbstractController::AbstractController(ControlWidget* widget) : widget(widget)
+AbstractController::AbstractController(PaintPanel* widget) : widget(widget)
 {
 }
 

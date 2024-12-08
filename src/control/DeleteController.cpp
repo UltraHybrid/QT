@@ -2,14 +2,14 @@
 
 #include <qevent.h>
 
-#include "ControlWidget.hpp"
+#include "PaintPanel.hpp"
 
 void DeleteController::mousePressEvent(QMouseEvent* event)
 {
 	const auto focusShape = widget->getFocusShape();
 	if (focusShape && event->button() == Qt::LeftButton)
 	{
-		ControlWidget::clearShape(focusShape);
+		PaintPanel::clearShape(focusShape);
 		widget->removeShape(focusShape);
 	}
 }

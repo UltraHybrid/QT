@@ -2,10 +2,10 @@
 
 #include <qevent.h>
 
-#include "ControlWidget.hpp"
+#include "PaintPanel.hpp"
 #include "ShapeFactory.hpp"
 
-CreateController::CreateController(ControlWidget* widget)
+CreateController::CreateController(PaintPanel* widget)
 		: AbstractController(widget)
 {
 }

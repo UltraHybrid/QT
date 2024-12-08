@@ -3,14 +3,14 @@
 
 class RelationWidget;
 class ShapeWidget;
-class ControlWidget;
+class PaintPanel;
 class QKeyEvent;
 class QMouseEvent;
 
 class AbstractController {
 public:
 	virtual ~AbstractController() = default;
-	explicit AbstractController(ControlWidget* widget);
+	explicit AbstractController(PaintPanel* widget);
 
 	virtual void mouseMoveEvent(QMouseEvent* event) {}
 	virtual void mousePressEvent(QMouseEvent* event) {}
@@ -19,7 +19,7 @@ public:
 	virtual void flush();
 
 protected:
-	ControlWidget* widget;
+	PaintPanel* widget;
 	ShapeWidget* activeShape{nullptr};
 	RelationWidget* activeRelation{nullptr};
 };

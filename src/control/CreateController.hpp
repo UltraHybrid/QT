@@ -6,7 +6,7 @@ class ShapeWidget;
 
 class CreateController : public AbstractController {
 public:
-	explicit CreateController(ControlWidget* widget);
+	explicit CreateController(PaintPanel* widget);
 
 	void mouseMoveEvent(QMouseEvent* event) override;
 	void mousePressEvent(QMouseEvent* event) override;

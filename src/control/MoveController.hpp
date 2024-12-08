@@ -8,7 +8,7 @@ class ShapeWidget;
 
 class MoveController : public AbstractController {
 public:
-	explicit MoveController(ControlWidget* widget)
+	explicit MoveController(PaintPanel* widget)
 		: AbstractController(widget)
 	{
 	}

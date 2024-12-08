@@ -20,8 +20,8 @@ add_executable(untitled3
         src/mainwnd.ui
         src/widgets/TriangleWidget.cpp
         src/widgets/TriangleWidget.hpp
-        src/widgets/ControlWidget.cpp
-        src/widgets/ControlWidget.hpp
+        src/widgets/PaintPanel.hpp
+        src/widgets/PaintPanel.cpp
         src/widgets/ShapeWidget.cpp
         src/widgets/ShapeWidget.hpp
         src/widgets/RelationWidget.cpp

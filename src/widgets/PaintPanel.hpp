@@ -11,7 +11,7 @@ class RelationWidget;
 class ShapeWidget;
 
 
-class ControlWidget : public QWidget {
+class PaintPanel final : public QWidget {
 public:
 	enum class Regime
 	{
@@ -22,7 +22,7 @@ public:
 		NONE
 	};
 
-	explicit ControlWidget(QWidget* parent);
+	explicit PaintPanel(QWidget* parent);
 
 	void mouseMoveEvent(QMouseEvent* event) override;
 	void mousePressEvent(QMouseEvent* event) override;
@@ -30,11 +30,11 @@ public:
 	void keyPressEvent(QKeyEvent* event) override;
 
 	void setRegime(Regime regime);
-	Regime getRegime();
+	[[nodiscard]] Regime getRegime() const;
 	void saveTo(QDataStream &stream);
 	void loadFrom(QDataStream &stream);
 	void setShapeType(ShapeType type);
-	ShapeType getShapeType() const;
+	[[nodiscard]] ShapeType getShapeType() const;
 	void addShape(ShapeWidget* shape);
 	void removeShape(ShapeWidget* shape);
 

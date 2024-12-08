@@ -5,7 +5,7 @@
 class DeleteController final : public AbstractController
 {
 public:
-	explicit DeleteController(ControlWidget* widget)
+	explicit DeleteController(PaintPanel* widget)
 		: AbstractController(widget)
 	{
 	}

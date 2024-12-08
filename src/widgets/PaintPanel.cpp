@@ -1,4 +1,4 @@
-#include "ControlWidget.hpp"
+#include "PaintPanel.hpp"
 
 #include <iostream>
 #include <qevent.h>
@@ -14,7 +14,7 @@
 #include "RelationController.hpp"
 
 
-ControlWidget::ControlWidget(QWidget* parent) : QWidget(parent)
+PaintPanel::PaintPanel(QWidget* parent) : QWidget(parent)
 {
 	controller = std::make_shared<ControlManager>(this);
 	controller->addController(Regime::MOVE, std::make_shared<MoveController>(this));
@@ -23,62 +23,62 @@ ControlWidget::ControlWidget(QWidget* parent) : QWidget(parent)
 	controller->addController(Regime::RELATION, std::make_shared<RelationController>(this));
 }
 
-void ControlWidget::mouseMoveEvent(QMouseEvent* event)
+void PaintPanel::mouseMoveEvent(QMouseEvent* event)
 {
 	QWidget::mouseMoveEvent(event);
 	controller->mouseMoveEvent(regime, event);
 }
 
-void ControlWidget::mousePressEvent(QMouseEvent* event)
+void PaintPanel::mousePressEvent(QMouseEvent* event)
 {
 	QWidget::mousePressEvent(event);
 	controller->mousePressEvent(regime, event);
 }
 
-void ControlWidget::mouseReleaseEvent(QMouseEvent* event)
+void PaintPanel::mouseReleaseEvent(QMouseEvent* event)
 {
 	QWidget::mouseReleaseEvent(event);
 	controller->mouseReleaseEvent(regime, event);
 }
 
-void ControlWidget::keyPressEvent(QKeyEvent* event)
+void PaintPanel::keyPressEvent(QKeyEvent* event)
 {
 	QWidget::keyPressEvent(event);
 	controller->keyPressEvent(regime, event);
 }
 
-void ControlWidget::setRegime(const Regime regime)
+void PaintPanel::setRegime(const Regime regime)
 {
 	controller->flush();
 	this->regime = regime;
 }
 
-ControlWidget::Regime ControlWidget::getRegime()
+PaintPanel::Regime PaintPanel::getRegime() const
 {
 	return regime;
 }
 
-ShapeType ControlWidget::getShapeType() const
+ShapeType PaintPanel::getShapeType() const
 {
 	return createShapeType;
 }
 
-void ControlWidget::addShape(ShapeWidget* shape)
+void PaintPanel::addShape(ShapeWidget* shape)
 {
 	shapes.emplace(shape);
 }
 
-void ControlWidget::removeShape(ShapeWidget* shape)
+void PaintPanel::removeShape(ShapeWidget* shape)
 {
 	shapes.erase(shape);
 }
 
-void ControlWidget::setShapeType(const ShapeType type)
+void PaintPanel::setShapeType(const ShapeType type)
 {
 	createShapeType = type;
 }
 
-ShapeWidget* ControlWidget::getFocusShape()
+ShapeWidget* PaintPanel::getFocusShape()
 {
 	const auto shape = std::ranges::find_if(shapes, [this](const ShapeWidget* sw)
 	{
@@ -91,7 +91,7 @@ ShapeWidget* ControlWidget::getFocusShape()
 	return nullptr;
 }
 
-bool ControlWidget::isShapesConnect(ShapeWidget* sw1, ShapeWidget* sw2)
+bool PaintPanel::isShapesConnect(ShapeWidget* sw1, ShapeWidget* sw2)
 {
 	return std::ranges::any_of(sw1->getRelations(), [sw2](const RelationWidget* rw)
 	{
@@ -99,7 +99,7 @@ bool ControlWidget::isShapesConnect(ShapeWidget* sw1, ShapeWidget* sw2)
 	});
 }
 
-RelationWidget* ControlWidget::createRelation(QWidget* parent, ShapeWidget* sw1, ShapeWidget* sw2)
+RelationWidget* PaintPanel::createRelation(QWidget* parent, ShapeWidget* sw1, ShapeWidget* sw2)
 {
 	const auto rel = new RelationWidget;
 	rel->setParent(parent);
@@ -115,7 +115,7 @@ RelationWidget* ControlWidget::createRelation(QWidget* parent, ShapeWidget* sw1,
 	return rel;
 }
 
-void ControlWidget::clearShape(ShapeWidget* sw)
+void PaintPanel::clearShape(ShapeWidget* sw)
 {
 	for (const auto r : sw->getRelations())
 	{
@@ -126,13 +126,13 @@ void ControlWidget::clearShape(ShapeWidget* sw)
 	sw->close();
 }
 
-void ControlWidget::removeAllShapes()
+void PaintPanel::removeAllShapes()
 {
 	std::ranges::for_each(shapes, [](ShapeWidget* s){ clearShape(s);});
 	shapes.clear();
 }
 
-void ControlWidget::saveTo(QDataStream& stream)
+void PaintPanel::saveTo(QDataStream& stream)
 {
 	const auto shapesV = std::vector<ShapeWidget*>{shapes.begin(), shapes.end()};
 	auto res = QVector<ShapeInfo>{};
@@ -157,7 +157,7 @@ void ControlWidget::saveTo(QDataStream& stream)
 	stream << res;
 }
 
-void ControlWidget::loadFrom(QDataStream& stream)
+void PaintPanel::loadFrom(QDataStream& stream)
 {
 	removeAllShapes();
 

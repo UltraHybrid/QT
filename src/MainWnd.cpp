@@ -1,6 +1,6 @@
 #include "MainWnd.hpp"
 
-#include "ControlWidget.hpp"
+#include "PaintPanel.hpp"
 #include "QFileDialog"
 #include "EllipseWidget.hpp"
 #include "RectangleWidget.hpp"
@@ -13,7 +13,7 @@ MainWnd::MainWnd(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    cw = new ControlWidget{ui->frame};
+    cw = new PaintPanel{ui->frame};
     auto horizontalLayout = new QHBoxLayout(ui->frame);
     QSizePolicy sizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
     sizePolicy.setHorizontalStretch(0);
@@ -30,42 +30,40 @@ MainWnd::MainWnd(QWidget *parent) :
     cw->show();
 
     connect(ui->delete_action, &QAction::triggered, cw,
-        [=] { cw->setRegime(ControlWidget::Regime::DELETE); });
+        [=] { cw->setRegime(PaintPanel::Regime::DELETE); });
     connect(ui->move_action, &QAction::triggered, cw,
-       [=] { cw->setRegime(ControlWidget::Regime::MOVE); });
+       [=] { cw->setRegime(PaintPanel::Regime::MOVE); });
     connect(ui->relation_create_action, &QAction::triggered, cw,
-    [=] { cw->setRegime(ControlWidget::Regime::RELATION); });
+    [=] { cw->setRegime(PaintPanel::Regime::RELATION); });
 
     connect(ui->ellipse_create_action, &QAction::triggered, cw, [=]
     {
-        cw->setRegime(ControlWidget::Regime::CREATE);
+        cw->setRegime(PaintPanel::Regime::CREATE);
         cw->setShapeType(ShapeType::ELLIPSE);
     });
     connect(ui->rectangle_create_action, &QAction::triggered, cw, [=]
     {
-        cw->setRegime(ControlWidget::Regime::CREATE);
+        cw->setRegime(PaintPanel::Regime::CREATE);
         cw->setShapeType(ShapeType::RECTANGLE);
     });
     connect(ui->triangle_create_atcion, &QAction::triggered, cw, [=]
     {
-        cw->setRegime(ControlWidget::Regime::CREATE);
+        cw->setRegime(PaintPanel::Regime::CREATE);
         cw->setShapeType(ShapeType::TRIANGLE);
     });
     connect(ui->save_action, &QAction::triggered, cw, [=]
     {
-        auto regime = cw->getRegime();
-        cw->setRegime(ControlWidget::Regime::NONE);
+        cw->setRegime(PaintPanel::Regime::NONE);
+        unsetActions();
         save();
-        cw->setRegime(regime);
     });
 
     connect(ui->load_action, &QAction::triggered, cw,
     [=]
     {
-        auto regime = cw->getRegime();
-        cw->setRegime(ControlWidget::Regime::NONE);
+        cw->setRegime(PaintPanel::Regime::NONE);
+        unsetActions();
         load();
-        cw->setRegime(regime);
     });
 }
 
@@ -95,5 +93,10 @@ void MainWnd::load()
     file.open(QIODeviceBase::ReadOnly);
     QDataStream out(&file);
     cw->loadFrom(out);
+}
+
+void MainWnd::unsetActions() const
+{
+    std::ranges::for_each(ui->GroupTool->actions(), [](auto a){ a->setChecked(false); });
 }
 

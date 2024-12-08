@@ -1,5 +1,5 @@
 #pragma once
-#include "ControlWidget.hpp"
+#include "PaintPanel.hpp"
 #include "ShapeType.hpp"
 
 

@@ -29,29 +29,19 @@ void RelationController::mouseReleaseEvent(QMouseEvent* event)
 		// first
 		if (!activeRelation && activeShape == shape)
 		{
-			activeRelation = ControlWidget::createRelation(widget, shape, nullptr);
+			activeRelation = PaintPanel::createRelation(widget, shape, nullptr);
 			activeRelation->setDstPoint(widget->mapFromGlobal(QCursor::pos()));
 			activeRelation->show();
 			return;
 		}
 		// second
-		if (activeRelation)
+		if (activeRelation && activeShape && activeShape != shape)
 		{
-			activeRelation->close();
-			if (activeShape && activeShape != shape)
-			{
-				activeRelation = ControlWidget::createRelation(widget, activeShape, shape);
-				activeRelation->show();
-			}
+			PaintPanel::createRelation(widget, activeShape, shape)->show();\
 		}
 	}
-	else if (activeRelation)
-	{
-		activeRelation->close();
-	}
 
-	activeRelation = nullptr;
-	activeShape = nullptr;
+	flush();
 }
 
 void RelationController::keyPressEvent(QKeyEvent* event)

@@ -4,7 +4,7 @@
 
 class RelationController : public AbstractController {
 public:
-	explicit RelationController(ControlWidget* widget)
+	explicit RelationController(PaintPanel* widget)
 		: AbstractController(widget)
 	{
 	}
