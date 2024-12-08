@@ -6,6 +6,7 @@
 #include "ShapeWidget.hpp"
 
 
+class ControlManager;
 class RelationWidget;
 class ShapeWidget;
 
@@ -29,23 +30,21 @@ public:
 	void keyPressEvent(QKeyEvent* event) override;
 
 	void setRegime(Regime regime);
+	Regime getRegime();
 	void saveTo(QDataStream &stream);
 	void loadFrom(QDataStream &stream);
 	void setShapeType(ShapeType type);
+	ShapeType getShapeType() const;
+	void addShape(ShapeWidget* shape);
+	void removeShape(ShapeWidget* shape);
 
 private:
-	ShapeWidget* activeShape{nullptr};
-	RelationWidget* activeRelation{nullptr};
 	std::unordered_set<ShapeWidget*> shapes{};
 	Regime regime{Regime::NONE};
 	ShapeType createShapeType;
+	std::shared_ptr<ControlManager> controller;
 
-
-	QPoint oldPos;
-	QPoint shapePosBeforeMoving;
-
-	void resetCreatedShape();
-	void resetCreatedRelation();
+public:
 	ShapeWidget* getFocusShape();
 
 	static bool isShapesConnect(ShapeWidget* sw1, ShapeWidget* sw2);

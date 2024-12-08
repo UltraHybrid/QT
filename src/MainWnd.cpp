@@ -53,15 +53,19 @@ MainWnd::MainWnd(QWidget *parent) :
     });
     connect(ui->save_action, &QAction::triggered, cw, [=]
     {
+        auto regime = cw->getRegime();
         cw->setRegime(ControlWidget::Regime::NONE);
         save();
+        cw->setRegime(regime);
     });
 
     connect(ui->load_action, &QAction::triggered, cw,
     [=]
     {
+        auto regime = cw->getRegime();
         cw->setRegime(ControlWidget::Regime::NONE);
         load();
+        cw->setRegime(regime);
     });
 }
 
