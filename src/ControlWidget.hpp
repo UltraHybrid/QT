@@ -27,7 +27,6 @@ public:
 	void mousePressEvent(QMouseEvent* event) override;
 	void mouseReleaseEvent(QMouseEvent* event) override;
 	void keyPressEvent(QKeyEvent* event) override;
-	void resizeEvent(QResizeEvent* event) override;
 
 	void setRegime(Regime regime);
 	void saveTo(QDataStream &stream);

@@ -113,7 +113,7 @@ void ControlWidget::mouseReleaseEvent(QMouseEvent* event)
 			{
 				setCursor(QCursor(Qt::ArrowCursor));
 			}
-			if (event->button() == Qt::RightButton)
+			if (activeShape && event->button() == Qt::RightButton)
 			{
 				setCursor(QCursor(Qt::ArrowCursor));
 				activeShape->move(shapePosBeforeMoving);
@@ -171,11 +171,6 @@ void ControlWidget::keyPressEvent(QKeyEvent* event)
 			activeShape = nullptr;
 		}
 	}
-}
-
-void ControlWidget::resizeEvent(QResizeEvent* event)
-{
-	QWidget::resizeEvent(event);
 }
 
 void ControlWidget::setRegime(const Regime regime)
@@ -272,11 +267,12 @@ void ControlWidget::saveTo(QDataStream& stream)
 		info.size = {sw->width(), sw->height()};
 		info.relationIds.reserve(sw->getRelations().size());
 
-		std::ranges::transform(sw->getRelations(), std::back_inserter(info.relationIds), [shapesV, sw](RelationWidget* rw)
-		{
-			const auto relateShape = rw->getFirst() == sw ? rw->getSecond() : rw->getFirst();
-			return std::ranges::find(shapesV, relateShape) - shapesV.begin();
-		});
+		std::ranges::transform(sw->getRelations(), std::back_inserter(info.relationIds),
+			[shapesV, sw](const RelationWidget* rw)
+			{
+				const auto relateShape = rw->getFirst() == sw ? rw->getSecond() : rw->getFirst();
+				return std::ranges::find(shapesV, relateShape) - shapesV.begin();
+			});
 
 		res.emplace_back(info);
 	}
