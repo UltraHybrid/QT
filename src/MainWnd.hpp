@@ -18,4 +18,7 @@ public:
 private:
     ControlWidget* cw;
     Ui::MainWnd *ui;
+
+    void save();
+    void load();
 };

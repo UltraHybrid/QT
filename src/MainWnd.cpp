@@ -36,52 +36,58 @@ MainWnd::MainWnd(QWidget *parent) :
     connect(ui->relation_create_action, &QAction::triggered, cw,
     [=] { cw->setRegime(ControlWidget::Regime::RELATION); });
 
-    connect(ui->ellipse_create_action, &QAction::triggered, cw,
-    [=]
+    connect(ui->ellipse_create_action, &QAction::triggered, cw, [=]
     {
         cw->setRegime(ControlWidget::Regime::CREATE);
         cw->setShapeType(ShapeType::ELLIPSE);
     });
-    connect(ui->rectangle_create_action, &QAction::triggered, cw,
-    [=]
+    connect(ui->rectangle_create_action, &QAction::triggered, cw, [=]
     {
         cw->setRegime(ControlWidget::Regime::CREATE);
         cw->setShapeType(ShapeType::RECTANGLE);
     });
-    connect(ui->triangle_create_atcion, &QAction::triggered, cw,
-    [=]
+    connect(ui->triangle_create_atcion, &QAction::triggered, cw, [=]
     {
         cw->setRegime(ControlWidget::Regime::CREATE);
         cw->setShapeType(ShapeType::TRIANGLE);
     });
-    connect(ui->save_action, &QAction::triggered, cw,
-   [=]
+    connect(ui->save_action, &QAction::triggered, cw, [=]
     {
-       QString filters("Custom files (*.cum);;All files (*.*)");
-       QString defaultFilter("Custom files (*.cum)");
-       auto path = QFileDialog::getSaveFileName(0, "Save file", QDir::currentPath(), filters, &defaultFilter);
-       if (path.isEmpty()) return;
-       auto file = QFile{path};
-       file.open(QIODeviceBase::WriteOnly);
-       QDataStream out(&file);
-       cw->saveTo(out);
+       save();
     });
 
     connect(ui->load_action, &QAction::triggered, cw,
     [=]
     {
-        QString filters("Custom files (*.cum);;All files (*.*)");
-        QString defaultFilter("Custom files (*.cum)");
-        auto path = QFileDialog::getOpenFileName(0, "Open file", QDir::currentPath(), filters, &defaultFilter);
-        if (path.isEmpty()) return;
-        auto file = QFile{path};
-        file.open(QIODeviceBase::ReadOnly);
-        QDataStream out(&file);
-        cw->loadFrom(out);
+        load();
     });
 }
 
 MainWnd::~MainWnd() {
     delete ui;
+}
+
+void MainWnd::save()
+{
+    QString filters("Custom files (*.cum);;All files (*.*)");
+    QString defaultFilter("Custom files (*.cum)");
+    auto path = QFileDialog::getSaveFileName(0, "Save file", QDir::currentPath(), filters, &defaultFilter);
+    if (path.isEmpty()) return;
+    auto file = QFile{path};
+    file.open(QIODeviceBase::WriteOnly);
+    QDataStream out(&file);
+    cw->saveTo(out);
+}
+
+void MainWnd::load()
+{
+    QString filters("Custom files (*.cum);;All files (*.*)");
+    QString defaultFilter("Custom files (*.cum)");
+    auto path = QFileDialog::getOpenFileName(0, "Open file", QDir::currentPath(), filters, &defaultFilter);
+    if (path.isEmpty()) return;
+    auto file = QFile{path};
+    file.open(QIODeviceBase::ReadOnly);
+    QDataStream out(&file);
+    cw->loadFrom(out);
 }
 

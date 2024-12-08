@@ -175,6 +175,11 @@ void ControlWidget::keyPressEvent(QKeyEvent* event)
 
 void ControlWidget::setRegime(const Regime regime)
 {
+	if (activeRelation)
+	{
+		resetCreatedRelation();
+		activeShape = nullptr;
+	}
 	this->regime = regime;
 }
 
