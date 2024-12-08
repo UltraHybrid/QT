@@ -18,23 +18,28 @@ add_executable(untitled3
         src/mainwnd.cpp
         src/mainwnd.hpp
         src/mainwnd.ui
-        src/TriangleWidget.cpp
-        src/TriangleWidget.hpp
-        src/ControlWidget.cpp
-        src/ControlWidget.hpp
-        src/ShapeWidget.cpp
-        src/ShapeWidget.hpp
-        src/RelationWidget.cpp
-        src/RelationWidget.hpp
-        src/EllipseWidget.cpp
-        src/EllipseWidget.hpp
-        src/RectangleWidget.cpp
-        src/RectangleWidget.hpp
+        src/widgets/TriangleWidget.cpp
+        src/widgets/TriangleWidget.hpp
+        src/widgets/ControlWidget.cpp
+        src/widgets/ControlWidget.hpp
+        src/widgets/ShapeWidget.cpp
+        src/widgets/ShapeWidget.hpp
+        src/widgets/RelationWidget.cpp
+        src/widgets/RelationWidget.hpp
+        src/widgets/EllipseWidget.cpp
+        src/widgets/EllipseWidget.hpp
+        src/widgets/RectangleWidget.cpp
+        src/widgets/RectangleWidget.hpp
         src/ShapeType.hpp
         src/ShapeFactory.cpp
         src/ShapeFactory.hpp
         src/ShapeInfo.cpp
         src/ShapeInfo.hpp
+)
+
+target_include_directories(untitled3 PUBLIC
+        src/
+        src/widgets
 )
 target_link_libraries(untitled3
   Qt::Core

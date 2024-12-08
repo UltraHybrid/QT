@@ -1,5 +1,5 @@
 #pragma once
-#include <ui_MainWnd.h>
+#include <QWidget>
 #include <unordered_set>
 
 #include "ShapeType.hpp"

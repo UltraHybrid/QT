@@ -53,12 +53,14 @@ MainWnd::MainWnd(QWidget *parent) :
     });
     connect(ui->save_action, &QAction::triggered, cw, [=]
     {
-       save();
+        cw->setRegime(ControlWidget::Regime::NONE);
+        save();
     });
 
     connect(ui->load_action, &QAction::triggered, cw,
     [=]
     {
+        cw->setRegime(ControlWidget::Regime::NONE);
         load();
     });
 }
