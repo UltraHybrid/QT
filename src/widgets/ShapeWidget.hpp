@@ -9,6 +9,7 @@ class RelationWidget;
 class ShapeWidget : public QWidget {
 public:
 	explicit ShapeWidget(QWidget* parent, ShapeType type);
+	virtual ~ShapeWidget() = default;
 
 	virtual QPoint getCenter() = 0;
 	virtual ShapeType getType(){ return type; }
